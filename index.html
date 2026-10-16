@@ -156,7 +156,7 @@ h1{font-family:"Fredoka","Trebuchet MS",sans-serif;font-weight:700;font-size:cla
 
 @media (max-width:900px){.bigidea{display:none}}
 .turn-tip{display:none;position:absolute;z-index:2;left:50%;bottom:12px;translate:-50% 0;width:max-content;max-width:calc(100% - 24px);text-align:center;background:var(--label-bg);color:var(--label-ink);font-size:15px;padding:6px 12px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none}
-@media (orientation:portrait) and (max-width:700px){.turn-tip{display:block}}
+@media (orientation:portrait) and (max-width:700px){.turn-tip{display:block}.school{order:2;flex-basis:100%}}
 @media (max-width:640px){
   .app{gap:8px;padding:8px}
   .handle{width:46px;height:46px;margin:-23px 0 0 -23px}.knob svg{width:24px;height:24px}
@@ -213,12 +213,8 @@ h1{font-family:"Fredoka","Trebuchet MS",sans-serif;font-weight:700;font-size:cla
 <div class="app">
   <header class="topbar">
     <div class="brand">
-      <div class="badge" aria-hidden="true">
-        <svg viewBox="0 0 40 40"><rect class="sl" x="7" y="8" width="4" height="24" rx="1.5"/><rect class="sl" x="15" y="8" width="4" height="24" rx="1.5"/><rect class="sl" x="23" y="8" width="4" height="24" rx="1.5"/><rect class="sl" x="31" y="8" width="4" height="24" rx="1.5"/><rect class="rl" x="3" y="12" width="35" height="3.4" rx="1.7"/><rect class="rl" x="3" y="24.6" width="35" height="3.4" rx="1.7"/></svg>
-      </div>
       <div>
         <h1>Charlie’s Parallel Lines Railway</h1>
-        <p class="lead">Drag the yellow handles to move the rails. The wooden <b>sleepers</b> show how far apart the rails are.</p>
       </div>
     </div>
     <aside class="bigidea" aria-label="Big idea">
@@ -1208,7 +1204,12 @@ function updateOverlay() {
   if (introOn) {
     const ha = railPoint('a', HANDLE_S); put(hintEl, proj(ha.x, ha.y, RAIL_TOP), 'translate(calc(-100% - 44px),-50%)');
     const rp = railPoint('a', 13); put(vocabRail, proj(rp.x, rp.y, RAIL_TOP), 'translate(-50%,calc(-100% - 16px))');
-    const se = sleeperEnd(sleepers[2], 1); put(vocabSleeper, proj(se.x, se.y, SLEEPER_H), 'translate(-50%,calc(-100% - 14px))');
+    // 'sleeper' label sits above the track, or below it when the screen is too narrow for it to clear the 'rail' label
+    const se = sleeperEnd(sleepers[2], 1), ps = proj(se.x, se.y, SLEEPER_H), pr = proj(rp.x, rp.y, RAIL_TOP);
+    const below = Math.abs(pr[0] - ps[0]) < (vocabSleeper.offsetWidth + vocabRail.offsetWidth) / 2 + 8;
+    vocabSleeper.classList.toggle('up', !below); vocabSleeper.classList.toggle('down', below);
+    if (below) { const sb = sleeperEnd(sleepers[0], -1); put(vocabSleeper, proj(sb.x, sb.y, SLEEPER_H), 'translate(-50%,14px)'); }
+    else put(vocabSleeper, ps, 'translate(-50%,calc(-100% - 14px))');
   }
   const par = isParallel();
   gapEls.forEach((el, i) => {
